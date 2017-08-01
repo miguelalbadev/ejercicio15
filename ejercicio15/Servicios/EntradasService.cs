@@ -7,7 +7,7 @@ using System.Web;
 namespace ejercicio15.Repository {
     public class EntradasService : IEntradasService {
 
-        public static ApplicationDbContext applicationDbContext;
+        [ThreadStatic] public static ApplicationDbContext applicationDbContext;
 
         private IEntradasRepository entradasRepository;
 
@@ -30,7 +30,7 @@ namespace ejercicio15.Repository {
                     }
                     catch(Exception e) {
                         dbContextTransaction.Rollback();
-                        throw new Exception("He hecho rollback de la transacción",e);
+                        throw new Exception("He hecho rollback de la transacción", e);
                     }
                     
 

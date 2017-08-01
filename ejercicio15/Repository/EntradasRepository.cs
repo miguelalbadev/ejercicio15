@@ -8,7 +8,9 @@ namespace ejercicio15.Repository {
     public class EntradasRepository : IEntradasRepository {
 
         public Entrada Create(Entrada entrada) {
-            throw new NotImplementedException();
+
+            return EntradasService.applicationDbContext.Entradas.Add(entrada);
+            
         }
     }
 }
