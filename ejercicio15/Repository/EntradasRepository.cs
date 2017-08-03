@@ -10,43 +10,42 @@ namespace ejercicio15.Repository {
 
     public class EntradasRepository : IEntradasRepository {
 
-        [ThreadStatic]
-        public static ApplicationDbContext context;
-
+       
         public Entrada Create(Entrada entrada) {
-
-            return context.Entradas.Add(entrada);
-            
+            return ApplicationDbContext.applicationDbContext.Entradas.Create();                
         }
 
         public Entrada GetEntrada(long id) {
 
-            return context.Entradas.Find(id);
+            return ApplicationDbContext.applicationDbContext.Entradas.Find(id);
 
         }
 
         public IQueryable<Entrada> GetEntradas() {
-            IList<Entrada> lista = new List<Entrada>(context.Entradas);
+            IList<Entrada> lista = new List<Entrada>(ApplicationDbContext.applicationDbContext.Entradas);
             return lista.AsQueryable();
 
         }
 
-        public void PutEntrada(long id, Entrada entrada) {
-            context.Entry(entrada).State = EntityState.Modified;
+        public void PutEntrada(Entrada entrada) {
+            if (ApplicationDbContext.applicationDbContext.Entradas.Count(e => e.Id == entrada.Id) == 0) {
+                throw new Exception("No he encontrado la entidad ");
+            }
+            ApplicationDbContext.applicationDbContext.Entry(entrada).State = EntityState.Modified;
         }
 
         public Entrada PostEntrada(Entrada entrada) {
-            return context.Entradas.Add(entrada);
+            return ApplicationDbContext.applicationDbContext.Entradas.Add(entrada);
         }
 
-        public Entrada DeleteEntrada(long id) {
-            Entrada entrada = context.Entradas.Find(id);
+        public Entrada Delete(long id) {
+            Entrada entrada = ApplicationDbContext.applicationDbContext.Entradas.Find(id);
             if (entrada == null) {
-                return null;
+                throw new Exception("No he encontrado la entidad");
             }
-            else {
-                return context.Entradas.Remove(entrada);
-            }
+            ApplicationDbContext.applicationDbContext.Entradas.Remove(entrada);
+            return entrada;
+            
         }
     }
 }

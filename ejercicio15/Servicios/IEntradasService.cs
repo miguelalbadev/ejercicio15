@@ -8,7 +8,11 @@ namespace ejercicio15.Repository {
     public interface IEntradasService {
 
         Entrada Create(Entrada entrada);
-        IQueryable<Entrada> GetEntradas();
         Entrada Get(long id);
+        IQueryable<Entrada> GetEntradas();
+        void Put(Entrada entrada);
+        Entrada Delete(long id);
+        
+        
     }
 }

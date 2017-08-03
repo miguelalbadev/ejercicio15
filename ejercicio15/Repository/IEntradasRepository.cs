@@ -11,6 +11,7 @@ namespace ejercicio15.Repository {
         Entrada Create(Entrada entrada);
         IQueryable<Entrada> GetEntradas();
         Entrada GetEntrada(long id);
-        void PutEntrada(long id, Entrada entrada);
+        void PutEntrada(Entrada entrada);
+        Entrada Delete(long id);
     }
 }

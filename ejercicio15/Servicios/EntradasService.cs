@@ -6,38 +6,25 @@ using System.Web;
 
 namespace ejercicio15.Repository {
     public class EntradasService : IEntradasService {
-
-        [ThreadStatic] public static ApplicationDbContext applicationDbContext;
-
+        
         private IEntradasRepository entradasRepository;
 
         public EntradasService(IEntradasRepository _entradasRepository) {
             this.entradasRepository = _entradasRepository;
         }
 
-        public Entrada Create(Entrada entrada) {
+        public Entrada Get(long id) {
+
+            Entrada resultado;
 
             using (var context = new ApplicationDbContext()) {
 
-                
-                entrada = entradasRepository.Create(entrada);
-                
-            }
-            return entrada;
-        }
-
-        public Entrada Get (long id) {
-
-            Entrada entrada;
-
-            using (var context = new ApplicationDbContext()) {
-
-                applicationDbContext = context;
+                ApplicationDbContext.applicationDbContext = context;                
 
                 using (var dbContextTransaction = context.Database.BeginTransaction()) {
 
                     try {
-                        entrada = entradasRepository.GetEntrada(id);
+                        resultado = entradasRepository.GetEntrada(id);
                         context.SaveChanges();
                         dbContextTransaction.Commit();
                     }
@@ -47,11 +34,10 @@ namespace ejercicio15.Repository {
                     }
 
                 }
-                applicationDbContext = null;
-                return entrada;
+                ApplicationDbContext.applicationDbContext = null;
+                return resultado;
             }
 
-            
         }
 
         public IQueryable<Entrada> GetEntradas() {
@@ -60,7 +46,7 @@ namespace ejercicio15.Repository {
 
             using (var context = new ApplicationDbContext()) {
 
-                applicationDbContext = context;
+                ApplicationDbContext.applicationDbContext = context;
 
                 using (var dbContextTransaction = context.Database.BeginTransaction()) {
 
@@ -73,12 +59,83 @@ namespace ejercicio15.Repository {
                         dbContextTransaction.Rollback();
                         throw new Exception("He hecho rollback de la transacción", e);
                     }
-                    
+
                 }
-                applicationDbContext = null;
+                ApplicationDbContext.applicationDbContext = null;
                 return resultado;
             }
-            
+
         }
+
+        public Entrada Create(Entrada entrada) {
+
+            using (var context = new ApplicationDbContext()) {
+
+                ApplicationDbContext.applicationDbContext = context;
+
+                using(var dbContextTransaction = context.Database.BeginTransaction()) {
+                    try {
+                        entrada = entradasRepository.Create(entrada);
+                        context.SaveChanges();
+                        dbContextTransaction.Commit();
+                    }
+                    catch(Exception e) {
+                        dbContextTransaction.Rollback();
+                        throw new Exception("He hecho rollback de la transacción", e);
+                    }
+                }
+                
+                
+            }
+            ApplicationDbContext.applicationDbContext = null;
+            return entrada;
+        }
+
+        public void Put(Entrada entrada) {
+            using(var context = new ApplicationDbContext()) {
+
+                ApplicationDbContext.applicationDbContext = context;
+
+                using(var dbContextTransaction = context.Database.BeginTransaction()) {
+                    try {
+                        entradasRepository.PutEntrada(entrada);
+                        context.SaveChanges();
+                        dbContextTransaction.Commit();
+                    }
+                    catch(Exception e) {
+                        throw new Exception("He hecho rollback de la transacción", e);
+                    }
+                }
+            }
+            ApplicationDbContext.applicationDbContext = null;
+        }
+
+        public Entrada Delete(long id) {
+
+            Entrada resultado;
+
+            using(var context = new ApplicationDbContext()) {
+                ApplicationDbContext.applicationDbContext = context;
+                using(var dbContextTransaction = context.Database.BeginTransaction()) {
+                    try {
+                        resultado = entradasRepository.Delete(id);
+                        context.SaveChanges();
+                        dbContextTransaction.Commit();
+                    }
+                    catch(Exception e) {
+                        dbContextTransaction.Rollback();
+                        throw new Exception("He hecho rollback de la transacción", e);
+                    }
+                }
+            }
+            ApplicationDbContext.applicationDbContext = null;
+            return resultado;
+        }
+
+        
+
+        
+
+        
     }
 }

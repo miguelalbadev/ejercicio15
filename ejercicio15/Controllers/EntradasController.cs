@@ -23,10 +23,11 @@ namespace ejercicio15.Controllers
         public EntradasController(IEntradasService _entradasService) {
             this.entradasService = _entradasService;
         }
+
         // GET: api/Entradas
         public IQueryable<Entrada> GetEntradas()
         {
-            return db.Entradas;
+            return entradasService.GetEntradas();
         }
 
         // GET: api/Entradas/5
@@ -55,23 +56,14 @@ namespace ejercicio15.Controllers
             {
                 return BadRequest();
             }
-
-            db.Entry(entrada).State = EntityState.Modified;
-
+            
             try
             {
-                db.SaveChanges();
+                entradasService.Put(entrada);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception e)
             {
-                if (!EntradaExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw new Exception("Ocurrio un error en el método PUT ", e.InnerException);
             }
 
             return StatusCode(HttpStatusCode.NoContent);
@@ -85,10 +77,7 @@ namespace ejercicio15.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-            IEntradasRepository entradasRepository = new EntradasRepository();
-            IEntradasService entradasService = new EntradasService(entradasRepository);
-
+            
             entrada = entradasService.Create(entrada);
 
             return CreatedAtRoute("DefaultApi", new { id = entrada.Id }, entrada);
@@ -98,30 +87,15 @@ namespace ejercicio15.Controllers
         [ResponseType(typeof(Entrada))]
         public IHttpActionResult DeleteEntrada(long id)
         {
-            Entrada entrada = db.Entradas.Find(id);
-            if (entrada == null)
-            {
-                return NotFound();
+            Entrada entrada;
+            try {
+                entrada = entradasService.Delete(id);
             }
-
-            db.Entradas.Remove(entrada);
-            db.SaveChanges();
-
+            catch(Exception e) {
+                throw new Exception("Ocurrió un error durante el método DELETE ", e.InnerException);
+            }
             return Ok(entrada);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
-        private bool EntradaExists(long id)
-        {
-            return db.Entradas.Count(e => e.Id == id) > 0;
-        }
     }
 }
