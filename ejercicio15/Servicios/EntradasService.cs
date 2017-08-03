@@ -19,24 +19,66 @@ namespace ejercicio15.Repository {
 
             using (var context = new ApplicationDbContext()) {
 
+                
+                entrada = entradasRepository.Create(entrada);
+                
+            }
+            return entrada;
+        }
+
+        public Entrada Get (long id) {
+
+            Entrada entrada;
+
+            using (var context = new ApplicationDbContext()) {
+
                 applicationDbContext = context;
 
-                using(var dbContextTransaction = context.Database.BeginTransaction()) {
+                using (var dbContextTransaction = context.Database.BeginTransaction()) {
 
                     try {
-                        entrada = entradasRepository.Create(entrada);
+                        entrada = entradasRepository.GetEntrada(id);
                         context.SaveChanges();
                         dbContextTransaction.Commit();
                     }
-                    catch(Exception e) {
+                    catch (Exception e) {
+                        dbContextTransaction.Rollback();
+                        throw new Exception("He hecho rollback de la transacción", e);
+                    }
+
+                }
+                applicationDbContext = null;
+                return entrada;
+            }
+
+            
+        }
+
+        public IQueryable<Entrada> GetEntradas() {
+
+            IQueryable<Entrada> resultado;
+
+            using (var context = new ApplicationDbContext()) {
+
+                applicationDbContext = context;
+
+                using (var dbContextTransaction = context.Database.BeginTransaction()) {
+
+                    try {
+                        resultado = entradasRepository.GetEntradas();
+                        context.SaveChanges();
+                        dbContextTransaction.Commit();
+                    }
+                    catch (Exception e) {
                         dbContextTransaction.Rollback();
                         throw new Exception("He hecho rollback de la transacción", e);
                     }
                     
-
                 }
+                applicationDbContext = null;
+                return resultado;
             }
-            return entrada;
+            
         }
     }
 }

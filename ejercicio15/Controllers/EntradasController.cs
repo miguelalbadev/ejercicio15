@@ -18,6 +18,11 @@ namespace ejercicio15.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        private IEntradasService entradasService;
+
+        public EntradasController(IEntradasService _entradasService) {
+            this.entradasService = _entradasService;
+        }
         // GET: api/Entradas
         public IQueryable<Entrada> GetEntradas()
         {
@@ -28,7 +33,7 @@ namespace ejercicio15.Controllers
         [ResponseType(typeof(Entrada))]
         public IHttpActionResult GetEntrada(long id)
         {
-            Entrada entrada = db.Entradas.Find(id);
+            Entrada entrada = entradasService.Get(id);
             if (entrada == null)
             {
                 return NotFound();
