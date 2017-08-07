@@ -20,6 +20,7 @@ namespace ejercicio15.Controllers
 
         private IEntradasService entradasService;
 
+        
         public EntradasController(IEntradasService _entradasService) {
             this.entradasService = _entradasService;
         }
